@@ -1,4 +1,4 @@
-"""Observability module for Azure AI Foundry tracing and evaluation.
+"""Observability module for Microsoft Foundry tracing and evaluation.
 
 This module provides:
 - OpenTelemetry tracing with Azure Monitor integration
@@ -85,9 +85,9 @@ def create_resource(config: ObservabilityConfig | None = None) -> Resource:
 async def configure_foundry_observability(
     config: ObservabilityConfig | None = None,
 ) -> bool:
-    """Configure observability using Azure AI Foundry project connection.
+    """Configure observability using Microsoft Foundry project connection.
     
-    This method connects to Azure AI Foundry and uses the attached Application Insights
+    This method connects to Microsoft Foundry and uses the attached Application Insights
     for telemetry collection.
     
     Args:
@@ -279,7 +279,7 @@ def auto_configure_observability() -> bool:
     """Auto-configure observability based on available environment variables.
     
     Priority:
-    1. Azure AI Foundry project endpoint (best for Foundry integration)
+    1. Microsoft Foundry project endpoint (best for Foundry integration)
     2. Application Insights connection string
     3. OTLP endpoint (for Aspire Dashboard or other collectors)
     4. Local/console output (fallback)

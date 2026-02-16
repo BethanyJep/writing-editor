@@ -105,21 +105,21 @@ Paste your content, select type (article/social_media/video_script), and receive
 
 ## Observability & Tracing
 
-The application includes comprehensive observability features powered by OpenTelemetry and Azure Monitor for Azure AI Foundry integration.
+The application includes comprehensive observability features powered by OpenTelemetry and Azure Monitor for Microsoft Foundry integration.
 
 ### Features
 
 - **Distributed Tracing**: Full trace correlation across all workflow phases and agent invocations
 - **Metrics Collection**: Agent duration, suggestion counts, phase timing
 - **Evaluation Tracking**: Performance metrics, refinement improvement ratios
-- **Azure AI Foundry Integration**: Native support for Foundry's tracing and evaluation features
+- **Microsoft Foundry Integration**: Native support for Foundry's tracing and evaluation features
 
 ### Configuration
 
 Add observability configuration to your `.env` file:
 
 ```bash
-# Azure AI Foundry (recommended for Foundry tracing)
+# Microsoft Foundry (recommended for Foundry tracing)
 AZURE_AI_PROJECT_ENDPOINT=https://your-project.services.ai.azure.com/api/projects/your-project
 
 # OR: Application Insights (standalone Azure Monitor)
@@ -137,7 +137,7 @@ OTEL_SERVICE_VERSION=1.0.0
 
 | Backend | How to View |
 |---------|-------------|
-| **Azure AI Foundry** | Azure Portal → Azure AI Foundry → Operate → Tracing |
+| **Microsoft Foundry** | Azure Portal → Microsoft Foundry → Operate → Tracing |
 | **Application Insights** | Azure Portal → Application Insights → Transaction search |
 | **Aspire Dashboard** | http://localhost:18888 (run `docker run -p 18888:18888 -p 4317:4317 mcr.microsoft.com/dotnet/aspire-dashboard:latest`) |
 
@@ -177,4 +177,4 @@ WritingAgentWorkflow (root span)
 - Fact-Check Agent provides confidence levels and flags claims needing external verification
 - Agents collaborate rather than override—suggestions show cross-agent connections
 - **OpenTelemetry** integration for distributed tracing across all agents
-- **Azure AI Foundry** native support for tracing and evaluation
+- **Microsoft Foundry** native support for tracing and evaluation

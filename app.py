@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Flask web UI for the Writing Editor multi-agent assistant with Azure AI Foundry observability."""
+"""Flask web UI for the Writing Editor multi-agent assistant with Microsoft Foundry observability."""
 
 from __future__ import annotations
 
@@ -187,9 +187,9 @@ def traces():
     
     if config.foundry_project_endpoint:
         info["backends"].append({
-            "type": "Azure AI Foundry",
+            "type": "Microsoft Foundry",
             "endpoint": config.foundry_project_endpoint,
-            "view_traces": "Azure Portal > Azure AI Foundry > Operate > Tracing",
+            "view_traces": "Azure Portal > Microsoft Foundry > Operate > Tracing",
         })
     
     if config.application_insights_connection_string:
