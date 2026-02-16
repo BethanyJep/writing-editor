@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Writing Editor - Analyze Your Content{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+    <!-- Input Section -->
+    <section class="input-section card">
+        <h2>📝 Submit Your Content</h2>
+        <form id="analyze-form">
+            <div class="form-group">
+                <label for="content-type">Content Type</label>
+                <select id="content-type" name="content_type" required>
+                    {% for key, label in content_types.items() %}
+                    <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="content">Your Content</label>
+                <textarea 
+                    id="content" 
+                    name="content" 
+                    rows="10" 
+                    placeholder="Paste your article, social media post, or video script here..."
+                    required
+                ></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" id="submit-btn">
+                <span class="btn-text">🔍 Analyze Content</span>
+                <span class="btn-loading hidden">
+                    <span class="spinner"></span>
+                    Analyzing...
+                </span>
+            </button>
+        </form>
+    </section>
+    
+    <!-- Loading State -->
+    <section class="loading-section hidden" id="loading-section">
+        <div class="loading-card card">
+            <div class="loading-spinner"></div>
+            <h3>Analyzing your content...</h3>
+            <p class="loading-status" id="loading-status">Phase 1: Independent agent analysis...</p>
+            <div class="agent-indicators">
+                <span class="agent-dot" title="Research Agent">📚</span>
+                <span class="agent-dot" title="Grammar Agent">📝</span>
+                <span class="agent-dot" title="Fact-Check Agent">✓</span>
+                <span class="agent-dot" title="Audience Agent">👥</span>
+                <span class="agent-dot" title="Style Agent">🎨</span>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Results Section -->
+    <section class="results-section hidden" id="results-section">
+        <h2>📊 Analysis Results</h2>
+        
+        <!-- Unified Summary -->
+        <div class="card unified-summary" id="unified-summary">
+            <h3>🎯 Unified Recommendations</h3>
+            <div class="summary-content" id="summary-content"></div>
+        </div>
+        
+        <!-- Agent Results Tabs -->
+        <div class="card agent-results">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="editing">✏️ Editing View</button>
+                <button class="tab-btn" data-tab="refined">Refined Analysis</button>
+                <button class="tab-btn" data-tab="initial">Initial Analysis</button>
+            </div>
+            
+            <!-- Editing View Tab -->
+            <div class="tab-content" id="editing-tab">
+                <div class="editing-view">
+                    <div class="editing-document" id="editing-document"></div>
+                    <aside class="editing-comments" id="editing-comments"></aside>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="refined-tab">
+                <div class="agent-cards" id="refined-results"></div>
+            </div>
+            
+            <div class="tab-content hidden" id="initial-tab">
+                <div class="agent-cards" id="initial-results"></div>
+            </div>
+        </div>
+        
+        <!-- Analyze Another Button -->
+        <div class="actions">
+            <button class="btn btn-secondary" id="new-analysis-btn">
+                ✨ Analyze Another
+            </button>
+        </div>
+    </section>
+    
+    <!-- Error Section -->
+    <section class="error-section hidden" id="error-section">
+        <div class="card error-card">
+            <h3>❌ Error</h3>
+            <p id="error-message"></p>
+            <button class="btn btn-secondary" id="retry-btn">Try Again</button>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('analyze-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const loadingSection = document.getElementById('loading-section');
+    const resultsSection = document.getElementById('results-section');
+    const errorSection = document.getElementById('error-section');
+    const inputSection = document.querySelector('.input-section');
+    
+    // Tab functionality
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            
+            // Update active tab button
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show/hide tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+        });
+    });
+    
+    // New analysis button
+    document.getElementById('new-analysis-btn').addEventListener('click', function() {
+        resultsSection.classList.add('hidden');
+        inputSection.classList.remove('hidden');
+        form.reset();
+    });
+    
+    // Retry button
+    document.getElementById('retry-btn').addEventListener('click', function() {
+        errorSection.classList.add('hidden');
+        inputSection.classList.remove('hidden');
+    });
+    
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const content = document.getElementById('content').value.trim();
+        const contentType = document.getElementById('content-type').value;
+        
+        if (!content) {
+            alert('Please enter some content to analyze.');
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.querySelector('.btn-text').classList.add('hidden');
+        submitBtn.querySelector('.btn-loading').classList.remove('hidden');
+        submitBtn.disabled = true;
+        
+        inputSection.classList.add('hidden');
+        loadingSection.classList.remove('hidden');
+        errorSection.classList.add('hidden');
+        resultsSection.classList.add('hidden');
+        
+        // Simulate progress updates
+        const statusEl = document.getElementById('loading-status');
+        const phases = [
+            'Phase 1: Independent agent analysis...',
+            'Phase 2: Team synthesis...',
+            'Phase 3: Generating unified recommendations...'
+        ];
+        let phaseIndex = 0;
+        const progressInterval = setInterval(() => {
+            phaseIndex = (phaseIndex + 1) % phases.length;
+            statusEl.textContent = phases[phaseIndex];
+        }, 3000);
+        
+        try {
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: content,
+                    content_type: contentType
+                })
+            });
+            
+            clearInterval(progressInterval);
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Analysis failed');
+            }
+            
+            const results = await response.json();
+            displayResults(results);
+            
+        } catch (error) {
+            clearInterval(progressInterval);
+            showError(error.message);
+        } finally {
+            // Reset button state
+            submitBtn.querySelector('.btn-text').classList.remove('hidden');
+            submitBtn.querySelector('.btn-loading').classList.add('hidden');
+            submitBtn.disabled = false;
+            loadingSection.classList.add('hidden');
+        }
+    });
+    
+    function displayResults(results) {
+        // Display unified summary
+        document.getElementById('summary-content').innerHTML = marked.parse(results.unified_summary);
+        
+        // Display editing view
+        renderEditingView(results.original_content, results.annotations);
+        
+        // Display refined results
+        const refinedContainer = document.getElementById('refined-results');
+        refinedContainer.innerHTML = results.refined_results.map(result => createAgentCard(result)).join('');
+        
+        // Display initial results
+        const initialContainer = document.getElementById('initial-results');
+        initialContainer.innerHTML = results.individual_results.map(result => createAgentCard(result)).join('');
+        
+        // Show results section
+        resultsSection.classList.remove('hidden');
+    }
+    
+    function renderEditingView(originalContent, annotations) {
+        const docEl = document.getElementById('editing-document');
+        const commentsEl = document.getElementById('editing-comments');
+        
+        const corrections = annotations.corrections || [];
+        const comments = annotations.comments || [];
+        
+        // Build annotated HTML from the original content
+        // First, collect all correction spans and sort by position
+        let spans = [];
+        corrections.forEach((c, idx) => {
+            const pos = originalContent.indexOf(c.original);
+            if (pos !== -1) {
+                spans.push({ start: pos, end: pos + c.original.length, type: 'correction', data: c, id: 'corr-' + idx });
+            }
+        });
+        // Sort by position, non-overlapping (take first occurrence)
+        spans.sort((a, b) => a.start - b.start);
+        // Remove overlaps
+        let filtered = [];
+        let lastEnd = 0;
+        for (const s of spans) {
+            if (s.start >= lastEnd) {
+                filtered.push(s);
+                lastEnd = s.end;
+            }
+        }
+        
+        // Build HTML
+        let html = '';
+        let cursor = 0;
+        for (const s of filtered) {
+            // Text before this span
+            html += escapeHtml(originalContent.slice(cursor, s.start));
+            // The correction
+            html += '<span class="correction" data-id="' + s.id + '">'
+                  + '<span class="correction-original">' + escapeHtml(s.data.original) + '</span>'
+                  + '<span class="correction-replacement">' + escapeHtml(s.data.replacement) + '</span>'
+                  + '<span class="correction-agent">' + escapeHtml(s.data.agent) + '</span>'
+                  + '</span>';
+            cursor = s.end;
+        }
+        html += escapeHtml(originalContent.slice(cursor));
+        
+        // Mark comment anchors in the text
+        let commentIndex = 0;
+        comments.forEach((c, idx) => {
+            const anchor = escapeHtml(c.anchor_text);
+            if (anchor && html.includes(anchor)) {
+                const marker = '<span class="comment-anchor" data-comment-id="comment-' + idx + '">'
+                    + anchor
+                    + '<span class="comment-marker" title="' + escapeHtml(c.comment) + '">' + (idx + 1) + '</span>'
+                    + '</span>';
+                // Replace only the first occurrence not already inside a tag
+                html = html.replace(anchor, marker);
+            }
+        });
+        
+        // Wrap in paragraphs (split on double newlines)
+        html = html.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>');
+        html = '<p>' + html + '</p>';
+        
+        docEl.innerHTML = html;
+        
+        // Build comment sidebar
+        const agentColors = {
+            'Research Agent': '#8b5cf6',
+            'Grammar Agent': '#ef4444',
+            'Fact-Check Agent': '#f59e0b',
+            'Audience Agent': '#3b82f6',
+            'Style Agent': '#10b981',
+        };
+        
+        let commentsHtml = '<h4>💬 Comments</h4>';
+        if (comments.length === 0 && corrections.length === 0) {
+            commentsHtml += '<p class="no-comments">No annotations generated.</p>';
+        }
+        comments.forEach((c, idx) => {
+            const color = agentColors[c.agent] || '#64748b';
+            commentsHtml += '<div class="comment-bubble" id="comment-' + idx + '" data-comment-id="comment-' + idx + '">'
+                + '<div class="comment-header">'
+                + '<span class="comment-number">' + (idx + 1) + '</span>'
+                + '<span class="comment-agent" style="color:' + color + '">' + escapeHtml(c.agent) + '</span>'
+                + (c.category ? '<span class="comment-category">' + escapeHtml(c.category) + '</span>' : '')
+                + '</div>'
+                + '<div class="comment-anchor-text">"' + escapeHtml(c.anchor_text) + '"</div>'
+                + '<div class="comment-body">' + escapeHtml(c.comment) + '</div>'
+                + '</div>';
+        });
+        commentsEl.innerHTML = commentsHtml;
+        
+        // Interactive: highlight comment when marker clicked
+        docEl.querySelectorAll('.comment-marker').forEach(marker => {
+            marker.addEventListener('click', function() {
+                const id = this.parentElement.dataset.commentId;
+                // Remove previous highlights
+                commentsEl.querySelectorAll('.comment-bubble').forEach(b => b.classList.remove('highlight'));
+                const bubble = document.getElementById(id);
+                if (bubble) {
+                    bubble.classList.add('highlight');
+                    bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        });
+        commentsEl.querySelectorAll('.comment-bubble').forEach(bubble => {
+            bubble.addEventListener('click', function() {
+                const id = this.dataset.commentId;
+                // Highlight the anchor in the document
+                docEl.querySelectorAll('.comment-anchor').forEach(a => a.classList.remove('highlight'));
+                const anchor = docEl.querySelector('[data-comment-id="' + id + '"]');
+                if (anchor) {
+                    anchor.classList.add('highlight');
+                    anchor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                // Highlight this bubble
+                commentsEl.querySelectorAll('.comment-bubble').forEach(b => b.classList.remove('highlight'));
+                this.classList.add('highlight');
+            });
+        });
+    }
+    
+    function createAgentCard(result) {
+        const agentIcons = {
+            'Research Agent': '📚',
+            'Grammar Agent': '📝',
+            'Fact-Check Agent': '✓',
+            'Audience Agent': '👥',
+            'Style Agent': '🎨'
+        };
+        
+        const icon = agentIcons[result.agent_name] || '🤖';
+        const suggestionsHtml = result.suggestions.length > 0 
+            ? `<div class="suggestions">
+                <h5>Suggestions:</h5>
+                <ul>${result.suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
+               </div>`
+            : '';
+        
+        const crossRefsHtml = Object.keys(result.cross_references).length > 0
+            ? `<div class="cross-refs">
+                <h5>Cross-References:</h5>
+                <ul>${Object.entries(result.cross_references).map(([agent, note]) => 
+                    `<li><strong>${escapeHtml(agent)}:</strong> ${escapeHtml(note)}</li>`
+                ).join('')}</ul>
+               </div>`
+            : '';
+        
+        return `
+            <div class="agent-card">
+                <div class="agent-header">
+                    <span class="agent-icon">${icon}</span>
+                    <h4>${escapeHtml(result.agent_name)}</h4>
+                </div>
+                <div class="agent-findings">
+                    ${marked.parse(result.findings)}
+                </div>
+                ${suggestionsHtml}
+                ${crossRefsHtml}
+            </div>
+        `;
+    }
+    
+    function showError(message) {
+        document.getElementById('error-message').textContent = message;
+        errorSection.classList.remove('hidden');
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% endblock %}

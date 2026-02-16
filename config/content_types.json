@@ -1,0 +1,71 @@
+{
+  "article": {
+    "label": "Article",
+    "grammar": {
+      "strictness": "high",
+      "notes": "Enforce formal grammar, proper punctuation, and complete sentences."
+    },
+    "fact_check": {
+      "thoroughness": "high",
+      "notes": "Identify all factual claims. Assess accuracy and flag anything needing external verification."
+    },
+    "audience": {
+      "focus": "depth",
+      "notes": "Evaluate whether the piece provides sufficient depth and context for an informed reader."
+    },
+    "style": {
+      "tone": "professional",
+      "notes": "Maintain formal, authoritative tone. Ensure consistent voice throughout."
+    },
+    "research": {
+      "depth": "comprehensive",
+      "notes": "Provide deep background context, related topics, and supporting information."
+    }
+  },
+  "social_media": {
+    "label": "Social Media Post",
+    "grammar": {
+      "strictness": "low",
+      "notes": "Allow casual tone, sentence fragments, and informal punctuation. Flag only clear errors."
+    },
+    "fact_check": {
+      "thoroughness": "moderate",
+      "notes": "Focus on verifiable claims. Lighter scrutiny for opinions and subjective statements."
+    },
+    "audience": {
+      "focus": "engagement",
+      "notes": "Evaluate hook strength, shareability, and platform-appropriate formatting."
+    },
+    "style": {
+      "tone": "conversational",
+      "notes": "Encourage authentic, relatable voice. Check for platform-appropriate length and hashtag usage."
+    },
+    "research": {
+      "depth": "trending",
+      "notes": "Identify trending angles, relevant cultural references, and timely connections."
+    }
+  },
+  "video_script": {
+    "label": "Video Script",
+    "grammar": {
+      "strictness": "moderate",
+      "notes": "Apply spoken-word grammar rules. Allow contractions and conversational phrasing. Flag awkward spoken passages."
+    },
+    "fact_check": {
+      "thoroughness": "high",
+      "notes": "Verify claims as videos reach wide audiences. Flag statistics and quotes for verification."
+    },
+    "audience": {
+      "focus": "pacing",
+      "notes": "Evaluate hook timing (first 5-10 seconds), pacing, retention points, and call-to-action placement."
+    },
+    "style": {
+      "tone": "energetic",
+      "notes": "Ensure dynamic, engaging delivery style. Check for visual cue opportunities and transition markers."
+    },
+    "research": {
+      "depth": "talking_points",
+      "notes": "Provide key talking points, supporting examples, and memorable statistics."
+    }
+  }
+}
