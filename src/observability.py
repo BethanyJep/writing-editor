@@ -42,6 +42,11 @@ _agent_duration_histogram: metrics.Histogram | None = None
 _agent_invocation_counter: metrics.Counter | None = None
 _suggestion_counter: metrics.Counter | None = None
 
+import ssl
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
+
 
 @dataclass
 class ObservabilityConfig:
